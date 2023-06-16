@@ -23,7 +23,7 @@ let args = getArgs();
   }
   if (expire && expire !== "false") {
     if (/^[\d.]+$/.test(expire)) expire *= 1000;
-    content.push(`到期：${formatTime(expire)}，注意到期时间哦`);
+    content.push(`到期：${formatTime(expire)}，#注意到期时间哦`);
   }
 
   let now = new Date();
