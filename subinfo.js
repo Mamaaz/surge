@@ -16,14 +16,14 @@ let args = getArgs();
   let used = info.download + info.upload;
   let total = info.total;
   let expire = args.expire || info.expire;
-  let content = [`🥳用量：${bytesToSize(used)} ♾️ ${bytesToSize(total)}`];
+  let content = [`用量：${bytesToSize(used)} ♾️ ${bytesToSize(total)} #怎么才用这么一点点`];
 
   if (resetDayLeft) {
-    content.push(`😶‍🌫️重置：剩余${resetDayLeft}天`);
+    content.push(`重置：剩余${resetDayLeft}天 #没几天啦`);
   }
   if (expire && expire !== "false") {
     if (/^[\d.]+$/.test(expire)) expire *= 1000;
-    content.push(`🫥到期：${formatTime(expire)}`);
+    content.push(`到期：${formatTime(expire)}，注意到期时间哦`);
   }
 
   let now = new Date();
