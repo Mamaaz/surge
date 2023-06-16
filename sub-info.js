@@ -38,4 +38,87 @@ let args = getArgs();
   });
 })();
 
-// 省略了其他函数的定义
+function getArgs() {
+  return Object.fromEntries(
+    $argument
+      .split("&")
+      .map((item) => item.split("="))
+      .map(([k, v]) => [k, decodeURIComponent(v)])
+  );
+}
+
+function getUserInfo(url) {
+  let method = args.method || "head";
+  let request = { headers: { "User-Agent": "Quantumult%20X" }, url };
+  return new Promise((resolve, reject) =>
+    $httpClient[method](request, (err, resp) => {
+      if (err != null) {
+        reject(err);
+        return;
+      }
+      if (resp.status !== 200) {
+        reject(resp.status);
+        return;
+      }
+      let header = Object.keys(resp.headers).find(
+        (key) => key.toLowerCase() === "subscription-userinfo"
+      );
+      if (header) {
+        resolve(resp.headers[header]);
+        return;
+      }
+      reject("链接响应头不带有流量信息");
+    })
+  );
+}
+
+async function getDataInfo(url) {
+  const [err, data] = await getUserInfo(url)
+    .then((data) => [null, data])
+    .catch((err) => [err, null]);
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  return Object.fromEntries(
+    data
+      .match(/\w+=[\d.eE+-]+/g)
+      .map((item) => item.split("="))
+      .map(([k, v]) => [k, Number(v)])
+  );
+}
+
+function getRmainingDays(resetDay) {
+  if (!resetDay) return;
+
+  let now = new Date();
+  let today = now.getDate();
+  let month = now.getMonth();
+  let year = now.getFullYear();
+  let daysInMonth;
+
+  if (resetDay > today) {
+    daysInMonth = 0;
+  } else {
+    daysInMonth = new Date(year, month + 1, 0).getDate();
+  }
+
+  return daysInMonth - today + resetDay;
+}
+
+function bytesToSize(bytes) {
+  if (bytes === 0) return "0B";
+  let k = 1024;
+  sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  let i = Math.floor(Math.log(bytes) / Math.log(k));
+  return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
+}
+
+function formatTime(time) {
+  let dateObj = new Date(time);
+  let year = dateObj.getFullYear();
+  let month = dateObj.getMonth() + 1;
+  let day = dateObj.getDate();
+  return year + "年" + month + "月" + day + "日";
+}
