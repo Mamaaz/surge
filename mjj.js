@@ -16,7 +16,7 @@ argument = url=http://guaiguaiqiqi.com&title=花里胡哨才是生产力&icon=bo
 */
 
 // 本地脚本修改URL信息
-let your_url = "http:103.117.103.33:8188";
+let your_url = "http:103.117.103.33";
 let arg;
 if (typeof $argument != 'undefined') {
     arg = Object.fromEntries($argument.split('&').map(item => item.split('=')));
