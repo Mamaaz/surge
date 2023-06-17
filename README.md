@@ -12,7 +12,7 @@
 `pip3 install psutil`
 ##### 编写程序
 `vim /root/servertraffic.py`
-`// Convert seconds to days, hours, minutes
+```// Convert seconds to days, hours, minutes
 function secondsToDhms(seconds) {
     seconds = Number(seconds);
     var d = Math.floor(seconds / (3600*24));
@@ -71,7 +71,7 @@ $httpClient.get(request, function(error, response, data) {
 
         $done(panel);
     }
-});`
+});```
 
 
 
