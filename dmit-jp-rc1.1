@@ -1,0 +1,56 @@
+// Converts seconds to a string in the format of "X day(s), Y hour(s), Z minute(s)"
+function secondsToDhms(seconds) {
+    const days = Math.floor(seconds / (3600*24));
+    const hours = Math.floor(seconds % (3600*24) / 3600);
+    const minutes = Math.floor(seconds % 3600 / 60);
+    
+    const dayStr = days > 0 ? `${days} day(s), ` : "";
+    const hourStr = hours > 0 ? `${hours} hour(s), ` : "";
+    const minuteStr = minutes > 0 ? `${minutes} minute(s)` : "";
+    
+    return dayStr + hourStr + minuteStr; 
+}
+
+// Converts bytes to GB
+function bytesToGB(bytes) {
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+}
+
+let url = " ";
+let arg;
+if (typeof $argument != 'undefined') {
+    arg = Object.fromEntries($argument.split('&').map(item => item.split('=')));
+};
+
+const URL = arg?.url || url;
+
+// 面板
+let panel = {};
+panel.title = arg?.title || 'DMIT-JP';  
+panel.icon = arg?.icon;
+
+// 发送请求获取信息
+const request = {
+    url: URL,
+    timeout: 3000
+};
+
+$httpClient.get(request, function(error, response, data) {
+    if (error) {
+        console.log(`Error: ${error}`);
+        $done({title:'Error', content:'An error occurred. Make sure the port is open.'});
+    } else  {
+        const serverData = JSON.parse(data);
+
+        panel.content = `运行时间：${secondsToDhms(serverData.uptime)}\n` +
+            `入站: ${bytesToGB(serverData.bytes_recv)} GB\t|\t` + 
+            `出站: ${bytesToGB(serverData.bytes_sent)} GB\n` +
+            `用量: ${bytesToGB(serverData.bytes_total)} GB\t|\t` + 
+            `总量: 300 GB\n` +
+            `CPU: ${parseFloat(serverData.cpu_usage).toFixed(2)}%\t|\t` + 
+            `内存: ${parseFloat(serverData.mem_usage).toFixed(2)}%\n` +
+            `服务到期时间：♾️`;
+
+        $done(panel);
+    }
+});
