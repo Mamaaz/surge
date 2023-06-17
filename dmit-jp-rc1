@@ -1,17 +1,15 @@
-// Convert seconds to days, hours, minutes, seconds
+// Convert seconds to days, hours, minutes
 function secondsToDhms(seconds) {
     seconds = Number(seconds);
     var d = Math.floor(seconds / (3600*24));
     var h = Math.floor(seconds % (3600*24) / 3600);
     var m = Math.floor(seconds % 3600 / 60);
-    var s = Math.floor(seconds % 60);
     
     var dDisplay = d > 0 ? d + (d === 1 ? " day, " : " days, ") : "";
     var hDisplay = h > 0 ? h + (h === 1 ? " hour, " : " hours, ") : "";
-    var mDisplay = m > 0 ? m + (m === 1 ? " minute, " : " minutes, ") : "";
-    var sDisplay = s > 0 ? s + (s === 1 ? " second" : " seconds") : "";
+    var mDisplay = m > 0 ? m + (m === 1 ? " minute" : " minutes") : "";
     
-    return dDisplay + hDisplay + mDisplay + sDisplay; 
+    return dDisplay + hDisplay + mDisplay; 
 }
 
 // Convert bytes to GB
@@ -19,7 +17,7 @@ function bytesToGB(bytes) {
     return (bytes / (1024 * 1024 * 1024)).toFixed(2);
 }
 
-let your_url = " ";
+let your_url = "http://iooio.io:8188";
 let arg;
 if (typeof $argument != 'undefined') {
     arg = Object.fromEntries($argument.split('&').map(item => item.split('=')));
@@ -47,7 +45,7 @@ $httpClient.get(request, function(error, response, data) {
         
         console.log(Data);
 
-        panel.content = `系统运行时间：${secondsToDhms(Data.uptime)}\n` +
+        panel.content = `运行时间：${secondsToDhms(Data.uptime)}\n` +
             `入站: ${bytesToGB(Data.bytes_recv)} GB` + '    |    ' + 
             `出站: ${bytesToGB(Data.bytes_sent)} GB\n` +
             `用量: ${bytesToGB(Data.bytes_total)} GB` + '     |    ' + 
