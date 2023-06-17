@@ -52,10 +52,13 @@ $httpClient.get(request, function(error, response, data) {
 
         console.log(Data);
     panel.content = `统计时间：${Data.last_time}\n` +
-             `入站: ${Data.bytes_recv}` + '    |    ' + `出站: ${Data.bytes_sent}\n` +
-             `用量: ${Data.bytes_total}` + '     |    ' + `总共: ${arg?.total}\n` +
-             `CPU: ${Data.cpu_usage}` + '           |    ' + `内存: ${Data.mem_usage}\n` +
-             `服务到期时间：${arg?.ddl}`;
+    `入站: ${bytesToGB(Data.bytes_recv)} GB` + '    |    ' + 
+    `出站: ${bytesToGB(Data.bytes_sent)} GB\n` +
+    `用量: ${bytesToGB(Data.bytes_total)} GB` + '     |    ' + 
+    `总共: ${arg?.total}\n` +
+    `CPU: ${Data.cpu_usage}` + '           |    ' + 
+    `内存: ${Data.mem_usage}\n` +
+    `服务到期时间：${arg?.ddl}`;
 
         $done(panel);
     }
