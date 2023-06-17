@@ -16,7 +16,7 @@ argument = url=http://guaiguaiqiqi.com&title=花里胡哨才是生产力&icon=bo
 */
 
 // 本地脚本修改URL信息
-let your_url = "iooio.io:8188";
+let your_url = "http://iooio.io:8188";
 let arg;
 if (typeof $argument != 'undefined') {
     arg = Object.fromEntries($argument.split('&').map(item => item.split('=')));
@@ -48,7 +48,8 @@ $httpClient.get(request, function(error, response, data) {
         $done({title:'啊呃～', content:'完蛋了，出错了！看看是不是端口没打开？'+error});
     } else  {
         const Data = JSON.parse(data);
-        const col = Diydecide(0, 30 ,70, parseInt(Data.mem));
+        const col = Diydecide(0, 30 ,70, parseFloat(Data.mem_usage));
+
         console.log(Data);
     panel.content = `统计时间：${Data.last_time}\n` +
              `入站: ${Data.bytes_recv}` + '    |    ' + `出站: ${Data.bytes_sent}\n` +
