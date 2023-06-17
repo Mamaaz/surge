@@ -71,9 +71,5 @@ $httpClient.get(request, function(error, response, data) {
 
         $done(panel);
     }
-});```
-
-
-
-
-
+});
+```
