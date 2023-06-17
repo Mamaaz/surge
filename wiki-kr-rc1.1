@@ -45,14 +45,18 @@ $httpClient.get(request, function(error, response, data) {
         
         console.log(Data);
 
+        const inbound = `入站: ${bytesToGB(Data.bytes_recv)} GB`.padEnd(20);
+        const outbound = `出站: ${bytesToGB(Data.bytes_sent)} GB`;
+        const usage = `用量: ${bytesToGB(Data.bytes_total)} GB`.padEnd(20);
+        const total = `总量: 200 GB`;
+        const cpuUsage = `CPU: ${parseFloat(Data.cpu_usage).toFixed(2)}%`.padEnd(20);
+        const memoryUsage = `内存: ${parseFloat(Data.mem_usage).toFixed(2)}%`;
+
         panel.content = `运行时间：${secondsToDhms(Data.uptime)}\n` +
             `内存使用：${Data.max_mem_process_name}\n` +
-            `入站: ${bytesToGB(Data.bytes_recv)} GB` + '    |    ' + 
-            `出站: ${bytesToGB(Data.bytes_sent)} GB\n` +
-            `用量: ${bytesToGB(Data.bytes_total)} GB` + '     |    ' + 
-            `总量: 200 GB\n` +
-            `CPU: ${parseFloat(Data.cpu_usage).toFixed(2)}%` + '           |    ' + 
-            `内存: ${parseFloat(Data.mem_usage).toFixed(2)}%\n` +
+            `${inbound}| ${outbound}\n` +
+            `${usage}| ${total}\n` +
+            `${cpuUsage}| ${memoryUsage}\n` +
             `服务到期时间：♾️`;
 
         $done(panel);
