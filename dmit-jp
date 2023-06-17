@@ -13,7 +13,7 @@ const URL = arg?.url || your_url;
 
 // 面板
 let panel = {};
-panel.title = arg?.title || 'DMIT-JP';  // Change the default title to 'DMIT-JP'
+panel.title = arg?.title || '🤖DMIT-JP';  // Change the default title to 'DMIT-JP'
 panel.icon = arg?.icon;
 
 // 发送请求获取信息
