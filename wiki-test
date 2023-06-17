@@ -17,15 +17,6 @@ function bytesToGB(bytes) {
     return (bytes / (1024 * 1024 * 1024)).toFixed(2);
 }
 
-// Your secret key
-const SECRET_KEY = 'JFEJAnQFoLG7is';
-
-function decrypt(text) {
-    let bytes = CryptoJS.AES.decrypt(text, SECRET_KEY);
-    let originalText = bytes.toString(CryptoJS.enc.Utf8);
-    return originalText;
-}
-
 let your_url = " ";
 let arg;
 if (typeof $argument != 'undefined') {
@@ -39,6 +30,9 @@ let panel = {};
 panel.title = arg?.title || 'Wiki-KR';  // Change the default title to 'DMIT-JP'
 panel.icon = arg?.icon;
 
+// The secret key for decryption
+const SECRET_KEY = 'QcSo6Q8Vb4GhmC'; 
+
 // 发送请求获取信息
 const request = {
     url: URL,
@@ -51,13 +45,17 @@ $httpClient.get(request, function(error, response, data) {
         $done({title:'啊呃～', content:'完蛋了，出错了！看看是不是端口没打开？'+error});
     } else  {
         // Decrypt data
-        const decryptedData = decrypt(data);
+        var bytes  = CryptoJS.AES.decrypt(data.toString(), SECRET_KEY);
+        var decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+
         const Data = JSON.parse(decryptedData);
+        
+        console.log(Data);
 
         const inbound = `入站: ${bytesToGB(Data.bytes_recv)} GB`.padEnd(20);
         const outbound = `出站: ${bytesToGB(Data.bytes_sent)} GB`;
         const usage = `用量: ${bytesToGB(Data.bytes_total)} GB`.padEnd(20);
-        const total = `总量: 300 GB`;
+        const total = `总量: 200 GB`;
         const cpuUsage = `CPU: ${parseFloat(Data.cpu_usage).toFixed(2)}%`.padEnd(20);
         const memoryUsage = `内存: ${parseFloat(Data.mem_usage).toFixed(2)}%`;
 
