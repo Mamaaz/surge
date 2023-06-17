@@ -51,7 +51,13 @@ $httpClient.get(request, function(error, response, data) {
         const col = Diydecide(0, 30 ,70, parseFloat(Data.mem_usage));
 
         console.log(Data);
-    panel.content = `统计时间：${Data.last_time}\n` +
+   // Convert bytes to GB
+function bytesToGB(bytes) {
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+}
+
+// 在原有代码的基础上改动
+panel.content = `统计时间：${Data.last_time}\n` +
     `入站: ${bytesToGB(Data.bytes_recv)} GB` + '    |    ' + 
     `出站: ${bytesToGB(Data.bytes_sent)} GB\n` +
     `用量: ${bytesToGB(Data.bytes_total)} GB` + '     |    ' + 
@@ -59,6 +65,7 @@ $httpClient.get(request, function(error, response, data) {
     `CPU: ${Data.cpu_usage}` + '           |    ' + 
     `内存: ${Data.mem_usage}\n` +
     `服务到期时间：${arg?.ddl}`;
+
 
         $done(panel);
     }
