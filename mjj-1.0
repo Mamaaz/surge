@@ -20,7 +20,7 @@ const URL = arg?.url || your_url;
 
 // 面板
 let panel = {};
-panel.title = arg?.title || 'VPSCAT';
+panel.title = arg?.title || 'DMIT-JP';
 panel.icon = arg?.icon;
 let shifts = {
     '1': arg?.low,
