@@ -50,12 +50,12 @@ $httpClient.get(request, function(error, response, data) {
         const Data = JSON.parse(data);
         const col = Diydecide(0, 30 ,70, parseInt(Data.mem));
         console.log(Data);
-    panel["icon-color"] = shifts[col];
-    panel.content = `统计时间：${Data.last_exec_time}\n` +
-                 `入站: ${Data.in}` + '    |    ' + `出站: ${Data.out}\n` +
-                 `用量: ${Data.all}` + '     |    ' + `总共: ${arg?.total}\n` +
-                 `CPU: ${Data.cpu}` + '           |    ' + `内存: ${Data.mem}\n` +
-                 `服务到期时间：${arg?.ddl}`;
+    panel.content = `统计时间：${Data.last_time}\n` +
+             `入站: ${Data.bytes_recv}` + '    |    ' + `出站: ${Data.bytes_sent}\n` +
+             `用量: ${Data.bytes_total}` + '     |    ' + `总共: ${arg?.total}\n` +
+             `CPU: ${Data.cpu_usage}` + '           |    ' + `内存: ${Data.mem_usage}\n` +
+             `服务到期时间：${arg?.ddl}`;
+
         $done(panel);
     }
 });
