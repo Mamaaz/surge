@@ -20,7 +20,7 @@ const URL = arg?.url || your_url;
 
 // 面板
 let panel = {};
-panel.title = arg?.title || 'DMIT-JP';
+panel.title = arg?.title || 'DMIT-JP';  // Change the default title to 'DMIT-JP'
 panel.icon = arg?.icon;
 let shifts = {
     '1': arg?.low,
@@ -43,7 +43,7 @@ $httpClient.get(request, function(error, response, data) {
         const col = Diydecide(0, 30 ,70, parseFloat(Data.mem_usage));
 
         console.log(Data);
-        panel.content = `统计时间：${Data.last_time}\n入站: ${bytesToGB(Data.bytes_recv)} GB    |    出站: ${bytesToGB(Data.bytes_sent)} GB\n用量: ${bytesToGB(Data.bytes_total)} GB     |    总共: ${arg?.total}\nCPU: ${Data.cpu_usage}           |    内存: ${Data.mem_usage}\n服务到期时间：${arg?.ddl}`;
+        panel.content = `统计时间：${Data.last_time}\n入站: ${bytesToGB(Data.bytes_recv)} GB    |    出站: ${bytesToGB(Data.bytes_sent)} GB\n用量: ${bytesToGB(Data.bytes_total)} GB     |    总共: 300\nCPU: ${Data.cpu_usage}           |    内存: ${Data.mem_usage}\n服务到期时间：♾️`;
 
         $done(panel);
     }
