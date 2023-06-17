@@ -31,7 +31,7 @@ panel.title = arg?.title || 'Wiki-KR';  // Change the default title to 'DMIT-JP'
 panel.icon = arg?.icon;
 
 // The secret key for decryption
-const SECRET_KEY = 'QcSo6Q8Vb4GhmC'; 
+const SECRET_KEY = 'Q3kdkNAGF4DTH4FR'; 
 
 // 发送请求获取信息
 const request = {
