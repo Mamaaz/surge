@@ -1,0 +1,50 @@
+// Convert bytes to GB
+function bytesToGB(bytes) {
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+}
+
+//确定变量所在区间
+function Diydecide(x, y, z, item) {
+    let array = [x, y, z];
+    array.push(item);
+    return array.sort((a, b) => a - b).findIndex(i => i === item);
+}
+
+let your_url = " ";
+let arg;
+if (typeof $argument != 'undefined') {
+    arg = Object.fromEntries($argument.split('&').map(item => item.split('=')));
+};
+
+const URL = arg?.url || your_url;
+
+// 面板
+let panel = {};
+panel.title = arg?.title || 'VPSCAT';
+panel.icon = arg?.icon;
+let shifts = {
+    '1': arg?.low,
+    '2': arg?.mid,
+    '3': arg?.high
+};
+
+// 发送请求获取信息
+const request = {
+    url: URL,
+    timeout: 3000
+};
+
+$httpClient.get(request, function(error, response, data) {
+    if (error) {
+        console.log('error: '+error);
+        $done({title:'啊呃～', content:'完蛋了，出错了！看看是不是端口没打开？'+error});
+    } else  {
+        const Data = JSON.parse(data);
+        const col = Diydecide(0, 30 ,70, parseFloat(Data.mem_usage));
+
+        console.log(Data);
+        panel.content = `统计时间：${Data.last_time}\n入站: ${bytesToGB(Data.bytes_recv)} GB    |    出站: ${bytesToGB(Data.bytes_sent)} GB\n用量: ${bytesToGB(Data.bytes_total)} GB     |    总共: ${arg?.total}\nCPU: ${Data.cpu_usage}           |    内存: ${Data.mem_usage}\n服务到期时间：${arg?.ddl}`;
+
+        $done(panel);
+    }
+});
