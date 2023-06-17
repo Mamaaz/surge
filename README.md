@@ -1,16 +1,16 @@
-### Surge serverinfo
-#### 感谢原作者@Sestea @clydetime  VPS端部分 @Sestea @整点猫咪
-#### 在原作基础上增加了最大内存占用进程显示，以及把内存和cpu显示改为百分比显示
+## Surge serverinfo
+### 感谢原作者@Sestea @clydetime  VPS端部分 @Sestea @整点猫咪
+### 在原作基础上增加了最大内存占用进程显示，以及把内存和cpu显示改为百分比显示
 
-# 安装步骤
-#Debian
-#更新升级包管理
+# 安装步骤(Debian)
+
+##### 更新升级包管理
 `apt update && apt upgrade -y`
-#安装python
+##### 安装python
 `apt install python python3-pip`
-#安装psutil库
+##### 安装psutil库
 `pip3 install psutil`
-#编写程序
+##### 编写程序
 `vim /root/servertraffic.py`
 `// Convert seconds to days, hours, minutes
 function secondsToDhms(seconds) {
