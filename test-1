@@ -1,0 +1,38 @@
+// Utility functions
+const secondsToDhms = seconds => {
+    const d = Math.floor(seconds / (3600*24));
+    const h = Math.floor(seconds % (3600*24) / 3600);
+    const m = Math.floor(seconds % 3600 / 60);
+
+    return `${d > 0 ? d + "天" : ""}${h > 0 ? h + "小时" : ""}${m > 0 ? m + "分钟" : ""}`; 
+}
+
+const bytesToGB = bytes => (bytes / (1024 * 1024 * 1024)).toFixed(2);
+
+const arg = typeof $argument != 'undefined' 
+    ? Object.fromEntries($argument.split('&').map(item => item.split('=')))
+    : { url: " ", title: 'Wiki-KR' };
+
+// Panel setup
+let panel = { title: arg.title, icon: arg.icon };
+
+// Request setup
+const request = { url: arg.url, timeout: 3000 };
+
+$httpClient.get(request, (error, response, data) => {
+    if (error) {
+        console.log(`Error: ${error}`);
+        $done({ title: '啊呃～', content: `出错了！看看是不是端口没打开？${error}` });
+    } else {
+        const Data = JSON.parse(data);
+        panel.content = `
+        运行时间：${secondsToDhms(Data.uptime)}
+        内存使用：${Data.max_mem_process_name}
+        入站: ${bytesToGB(Data.bytes_recv)} GB  |  出站: ${bytesToGB(Data.bytes_sent)} GB
+        用量: ${bytesToGB(Data.bytes_total)} GB  |  总量: 200 GB
+        CPU: ${Data.cpu_usage.toFixed(2)}%  |  内存: ${Data.mem_usage.toFixed(2)}%
+        服务到期时间：♾️
+        `;
+        $done(panel);
+    }
+});
