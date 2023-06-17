@@ -1,32 +1,22 @@
-// Convert bytes to GB
-function bytesToGB(bytes) {
-    return (bytes / (1024 * 1024 * 1024)).toFixed(2);
-}
-
-//确定变量所在区间
-function Diydecide(x, y, z, item) {
-    let array = [x, y, z];
-    array.push(item);
-    return array.sort((a, b) => a - b).findIndex(i => i === item);
-}
-
-let your_url = " ";
+let your_url = "";
 let arg;
 if (typeof $argument != 'undefined') {
     arg = Object.fromEntries($argument.split('&').map(item => item.split('=')));
 };
 
+// 检查配置
 const URL = arg?.url || your_url;
+if (!URL) $notification.post('配置错误❌', 'URL有误或无');
 
 // 面板
 let panel = {};
-panel.title = arg?.title || 'DMIT-JP';  // Change the default title to 'DMIT-JP'
+panel.title = arg?.title || 'DMIT-JP';
 panel.icon = arg?.icon;
-let shifts = {
-    '1': arg?.low,
-    '2': arg?.mid,
-    '3': arg?.high
-};
+
+// 时间
+let time = new Date();
+const t = time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds();
+console.log(t);
 
 // 发送请求获取信息
 const request = {
@@ -40,10 +30,29 @@ $httpClient.get(request, function(error, response, data) {
         $done({title:'啊呃～', content:'完蛋了，出错了！看看是不是端口没打开？'+error});
     } else  {
         const Data = JSON.parse(data);
-        const col = Diydecide(0, 30 ,70, parseFloat(Data.mem_usage));
 
         console.log(Data);
-        panel.content = `统计时间：${Data.last_time}\n入站: ${bytesToGB(Data.bytes_recv)} GB    |    出站: ${bytesToGB(Data.bytes_sent)} GB\n用量: ${bytesToGB(Data.bytes_total)} GB     |    总共: 300\nCPU: ${Data.cpu_usage}           |    内存: ${Data.mem_usage}\n服务到期时间：♾️`;
+
+        // Convert bytes to GB
+        function bytesToGB(bytes) {
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+        }
+
+        // Calculate remaining data
+        const totalData = 300; // total data in GB
+        const usedData = bytesToGB(parseFloat(Data.bytes_sent)) + bytesToGB(parseFloat(Data.bytes_recv));
+        const remainingData = totalData - usedData;
+
+        // 在原有代码的基础上改动
+        panel.content = `统计时间：${Data.last_time}\n` +
+            `入站: ${bytesToGB(Data.bytes_recv)} GB` + '    |    ' + 
+            `出站: ${bytesToGB(Data.bytes_sent)} GB\n` +
+            `用量: ${usedData} GB` + '     |    ' + 
+            `总量: ${totalData} GB\n` +
+            `剩余: ${remainingData.toFixed(2)} GB\n` +
+            `CPU: ${Data.cpu_usage.toFixed(2)}%` + '           |    ' + 
+            `内存: ${Data.mem_usage.toFixed(2)}%\n` +
+            `服务到期时间：♾️`;
 
         $done(panel);
     }
