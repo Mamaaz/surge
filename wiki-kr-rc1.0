@@ -46,11 +46,11 @@ $httpClient.get(request, function(error, response, data) {
         console.log(Data);
 
         panel.content = `运行时间：${secondsToDhms(Data.uptime)}\n` +
-            `内存使用最大的进程：${Data.max_mem_process_name}\n` +
+            `内存使用：${Data.max_mem_process_name}\n` +
             `入站: ${bytesToGB(Data.bytes_recv)} GB` + '    |    ' + 
             `出站: ${bytesToGB(Data.bytes_sent)} GB\n` +
             `用量: ${bytesToGB(Data.bytes_total)} GB` + '     |    ' + 
-            `总量: 300 GB\n` +
+            `总量: 200 GB\n` +
             `CPU: ${parseFloat(Data.cpu_usage).toFixed(2)}%` + '           |    ' + 
             `内存: ${parseFloat(Data.mem_usage).toFixed(2)}%\n` +
             `服务到期时间：♾️`;
