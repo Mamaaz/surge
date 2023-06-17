@@ -74,3 +74,41 @@ $httpClient.get(request, function(error, response, data) {
     }
 });
 ```
+
+##### 编写守护进程
+`vim /etc/systemd/system/servertraffic.service`
+```
+[Unit]
+Description=Server Traffic Monitor
+
+[Service]
+Type=simple
+WorkingDirectory=/root/
+User=root
+ExecStart=/usr/bin/python3 /root/servertraffic.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+##### 启动服务
+`systemctl start servertraffic.service`
+`systemctl enable servertraffic.service`
+##### 查看运行状态
+`systemctl status servertraffic.service`
+#### Surge模块
+```
+#!name=CatVPS
+#!desc=监控VPS流量信息和处理器、内存占用情况
+#!author= 面板和脚本部分@Sestea @clydetime  VPS端部分 @Sestea 由 @整点猫咪 进行整理,biu更改时间为23.06.17
+#!howto=将模块内容复制到本地后根据自己VPS IP地址及端口修改 http://127.0.0.1:7122
+
+
+
+[Panel]
+Serverinfo = script-name= Serverinfo,update-interval=3600
+
+[Script]
+Serverinfo = type=generic,script-path=https://raw.githubusercontent.com/getsomecat/GetSomeCats/Surge/script/serverinfo.js, argument = url=http://127.0.0.1:7122&name=Server Info
+```
+##### 注意这里的url最好提前用域名做好解析，以及Surge中需要让此域名直连。
