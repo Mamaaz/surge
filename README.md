@@ -13,66 +13,62 @@
 ##### 编写程序
 `vim /root/servertraffic.py`
 ```
-// Convert seconds to days, hours, minutes
-function secondsToDhms(seconds) {
-    seconds = Number(seconds);
-    var d = Math.floor(seconds / (3600*24));
-    var h = Math.floor(seconds % (3600*24) / 3600);
-    var m = Math.floor(seconds % 3600 / 60);
-    
-    var dDisplay = d > 0 ? d + "天" : "";
-    var hDisplay = h > 0 ? h + "小时" : "";
-    var mDisplay = m > 0 ? m + "分钟" : "";
-    
-    return dDisplay + hDisplay + mDisplay; 
-}
+#!/usr/bin/env python3
+# Sestea
 
-// Convert bytes to GB
-function bytesToGB(bytes) {
-    return (bytes / (1024 * 1024 * 1024)).toFixed(2);
-}
+import http.server
+import socketserver
+import json
+import time
+import psutil
 
-let your_url = " ";
-let arg;
-if (typeof $argument != 'undefined') {
-    arg = Object.fromEntries($argument.split('&').map(item => item.split('=')));
-};
+# The port number of the local HTTP server, which can be modified
+PORT = 8288
 
-const URL = arg?.url || your_url;
+class RequestHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
 
-// 面板
-let panel = {};
-panel.title = arg?.title || 'WIKI-KR';  // Change the default title to 'DMIT-JP'
-panel.icon = arg?.icon;
+        # Limit the HTTP server to one request per second
+        time.sleep(1)
 
-// 发送请求获取信息
-const request = {
-    url: URL,
-    timeout: 3000
-};
+        # Get the last statistics time
+        last_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-$httpClient.get(request, function(error, response, data) {
-    if (error) {
-        console.log('error: '+error);
-        $done({title:'啊呃～', content:'完蛋了，出错了！看看是不是端口没打开？'+error});
-    } else  {
-        const Data = JSON.parse(data);
-        
-        console.log(Data);
+        # Find the process with maximum memory usage
+        max_mem_process = None
+        for proc in psutil.process_iter(['pid', 'name', 'memory_percent']):
+            if max_mem_process is None or proc.info['memory_percent'] > max_mem_process.info['memory_percent']:
+                max_mem_process = proc
 
-        panel.content = `运行时间：${secondsToDhms(Data.uptime)}\n` +
-            `内存使用：${Data.max_mem_process_name}\n` +
-            `入站: ${bytesToGB(Data.bytes_recv)} GB` + '    |    ' + 
-            `出站: ${bytesToGB(Data.bytes_sent)} GB\n` +
-            `用量: ${bytesToGB(Data.bytes_total)} GB` + '     |    ' + 
-            `总量: 200 GB\n` +
-            `CPU: ${parseFloat(Data.cpu_usage).toFixed(2)}%` + '           |    ' + 
-            `内存: ${parseFloat(Data.mem_usage).toFixed(2)}%\n` +
-            `服务到期时间：♾️`;
+        # Construct JSON dictionary
+        response_dict = {
+            "utc_timestamp": int(time.time()),
+            "uptime": int(time.time() - psutil.boot_time()),
+            "cpu_usage": psutil.cpu_percent(),
+            "mem_usage": psutil.virtual_memory().percent,
+            "bytes_sent": str(psutil.net_io_counters().bytes_sent),
+            "bytes_recv": str(psutil.net_io_counters().bytes_recv),
+            "bytes_total": str(psutil.net_io_counters().bytes_sent + psutil.net_io_counters().bytes_recv),
+            "last_time": last_time,
+            "max_mem_process_pid": max_mem_process.info['pid'],
+            "max_mem_process_name": max_mem_process.info['name'],
+            "max_mem_process_usage": max_mem_process.info['memory_percent']
+        }
 
-        $done(panel);
-    }
-});
+        # Convert JSON dictionary to JSON string
+        response_json = json.dumps(response_dict).encode('utf-8')
+        self.wfile.write(response_json)
+
+with socketserver.ThreadingTCPServer(("", PORT), RequestHandler) as httpd:
+    try:
+        print(f"Serving at port {PORT}")
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt is captured, program exited")
+
 ```
 
 ##### 编写守护进程
