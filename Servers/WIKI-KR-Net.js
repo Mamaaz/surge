@@ -50,11 +50,11 @@ $httpClient.get(request, function(error, response, data) {
         const total = `总量: 200 GB`;
         const cpuUsage = `CPU: ${parseFloat(Data.cpu_usage).toFixed(2)}%`.padEnd(20);
         const memoryUsage = `内存: ${parseFloat(Data.mem_usage).toFixed(2)}%`;
-        const sendRate = Data.send_rate ? `UR: ${parseFloat(Data.send_rate).toFixed(2)} Mbps`.padEnd(20) : '发送速率: 数据还未准备好';
-        const recvRate = Data.recv_rate ? `DR: ${parseFloat(Data.recv_rate).toFixed(2)} Mbps` : '接收速率: 数据还未准备好';
+        const sendRate = Data.send_rate ? `↑: ${parseFloat(Data.send_rate).toFixed(2)} Mbps`.padEnd(20) : '发送速率: 数据还未准备好';
+        const recvRate = Data.recv_rate ? `↓: ${parseFloat(Data.recv_rate).toFixed(2)} Mbps` : '接收速率: 数据还未准备好';
 
         // Set title with sendRate and recvRate
-        panel.title = arg?.title || `Wiki-KR - ${sendRate} | ${recvRate}`;
+        panel.title = arg?.title || `Wiki-KR   ${sendRate} | ${recvRate}`;
 
         panel.content = `运行时间：${secondsToDhms(Data.uptime)}\n` +
             `内存使用：${Data.max_mem_process_name}\n` +
