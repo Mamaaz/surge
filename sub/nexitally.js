@@ -1,23 +1,65 @@
-const getArgs = (url) => {
+/*
+ * 由@mieqq编写
+ * 原脚本地址：https://raw.githubusercontent.com/mieqq/mieqq/master/sub_info_panel.js
+ * 由@Rabbit-Spec修改
+ * 更新日期：2022.08.24
+ * 版本：1.5
+*/
+
+let args = getArgs();
+
+(async () => {
+  let info = await getDataInfo(args.url);
+  if (!info) $done();
+  let resetDayLeft = getRmainingDays(parseInt(args["reset_day"]));
+
+  let used = info.download + info.upload;
+  let total = info.total;
+  let expire = args.expire || info.expire;
+  let content = [`用量：${bytesToSize(used)} | ${bytesToSize(total)}`];
+
+  if (resetDayLeft) {
+    content.push(`重置：剩余${resetDayLeft}天`);
+  }
+  if (expire && expire !== "false") {
+    if (/^[\d.]+$/.test(expire)) expire *= 1000;
+    content.push(`到期：${formatTime(expire)}`);
+  }
+
+  let now = new Date();
+  let hour = now.getHours();
+  let minutes = now.getMinutes();
+  hour = hour > 9 ? hour : "0" + hour;
+  minutes = minutes > 9 ? minutes : "0" + minutes;
+
+  $done({
+    title: `${args.title} | ${hour}:${minutes}`,
+    content: content.join("\n"),
+    icon: args.icon || "airplane.circle",
+    "icon-color": args.color || "#007aff",
+  });
+})();
+
+function getArgs() {
   return Object.fromEntries(
-    url
-      .slice(url.indexOf("?") + 1)
+    $argument
       .split("&")
       .map((item) => item.split("="))
       .map(([k, v]) => [k, decodeURIComponent(v)])
   );
-};
+}
 
-const getUserInfo = (url) => {
+function getUserInfo(url) {
+  let method = args.method || "head";
   let request = { headers: { "User-Agent": "Quantumult%20X" }, url };
   return new Promise((resolve, reject) =>
-    $httpClient.head(request, (err, resp) => {
+    $httpClient[method](request, (err, resp) => {
       if (err != null) {
         reject(err);
         return;
       }
       if (resp.status !== 200) {
-        reject("Not Available");
+        reject(resp.status);
         return;
       }
       let header = Object.keys(resp.headers).find(
@@ -30,104 +72,55 @@ const getUserInfo = (url) => {
       reject("链接响应头不带有流量信息");
     })
   );
-};
+}
 
-const getDataInfo = async (url) => {
-  try {
-    const data = await getUserInfo(url);
-    return Object.fromEntries(
-      data
-        .match(/\w+=\d+/g)
-        .map((item) => item.split("="))
-        .map(([k, v]) => [k, parseInt(v)])
-    );
-  } catch (err) {
+async function getDataInfo(url) {
+  const [err, data] = await getUserInfo(url)
+    .then((data) => [null, data])
+    .catch((err) => [err, null]);
+  if (err) {
     console.log(err);
+    return;
   }
-};
 
-const getRemainingDays = (today, resetDay, year, month) => {
-  if (!resetDay) return 0;
-  let daysInMonth = new Date(year, month + 1, 0).getDate();
-  if (resetDay > today) daysInMonth = 0;
-
-  return daysInMonth - today + resetDay;
-};
-
-const bytesToSize = (bytes) => {
-  if (bytes === 0) return "0B";
-  let k = 1024;
-  sizes = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
-  let i = Math.floor(Math.log(bytes) / Math.log(k));
-  return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
-};
-
-const formatTime = (time) => {
-  let dateObj = new Date(time);
-  let year = dateObj.getFullYear();
-  let month = dateObj.getMonth() + 1;
-  let day = dateObj.getDate();
-  return year + "/" + month + "/" + day + "";
-};
-
-const postNotification = (title, subtitle, body) => {
-  $notification.post(title, subtitle, body);
-};
-
-const is_enhanced_mode = () => {
-  return new Promise((resolve) =>
-    $httpAPI("GET", "v1/features/enhanced_mode", null, (data) => {
-      resolve(data.enabled);
-    })
+  return Object.fromEntries(
+    data
+      .match(/\w+=[\d.eE+-]+/g)
+      .map((item) => item.split("="))
+      .map(([k, v]) => [k, Number(v)])
   );
-};
+}
 
-const sleep = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms))
-};
+function getRmainingDays(resetDay) {
+  if (!resetDay) return;
 
-const get_time = () => {
-  let now = new Date();
-  let hour = now.getHours();
-  let minutes = now.getMinutes();
-  hour = hour > 9 ? hour : "0" + hour;
-  minutes = minutes > 9 ? minutes : "0" + minutes;
-  return hour + ":" + minutes;
-};
-
-(async () => {
   let now = new Date();
   let today = now.getDate();
   let month = now.getMonth();
   let year = now.getFullYear();
-  let args = getArgs($request.url);
-  let resetDay = parseInt(args["due_day"] || args["reset_day"]);
-  let resetDayLeft = getRemainingDays(today, resetDay, year, month);
+  let daysInMonth;
 
-  let is_enhanced = await is_enhanced_mode();
-  if (is_enhanced) await sleep(2000)
-  let usage = await getDataInfo(args.url);
-  if (!usage) {
-    $done({})
-    return;
-  }
-  let used = usage.download + usage.upload;
-  let total = usage.total;
-  let expire = usage.expire || args.expire;
-  let localProxy = '=http, localhost, 6152'
-  let infoList = [`${bytesToSize(used)} | ${bytesToSize(total-used)}`];
-
-  if (resetDayLeft) {
-    infoList.push(`重置: 剩余${resetDayLeft}天`);
-  }
-  if (expire) {
-    if (/^[\d.]+$/.test(expire)) expire *= 1000;
-    infoList.push(`到期: ${formatTime(expire)}`);
+  if (resetDay > today) {
+    daysInMonth = 0;
+  } else {
+    daysInMonth = new Date(year, month + 1, 0).getDate();
   }
 
-  // Replace sendNotification with postNotification
-  postNotification(used / total, expire, infoList);
-  infoList.push(`更新: ${get_time()}`)
-  let body = infoList.map(item => item+localProxy).join("\n");
-  $done({ response: { body} });
-})();
+  return daysInMonth - today + resetDay;
+}
+
+function bytesToSize(bytes) {
+  if (bytes === 0) return "0B";
+  let k = 1024;
+  sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  let i = Math.floor(Math.log(bytes) / Math.log(k));
+  return (bytes / Math.pow(k, i)).toFixed(2) + " " + sizes[i];
+}
+
+function formatTime(time) {
+  let dateObj = new Date(time);
+  let year = dateObj.getFullYear();
+  let month = dateObj.getMonth() + 1;
+  let day = dateObj.getDate();
+  return year + "年" + month + "月" + day + "日";
+}
