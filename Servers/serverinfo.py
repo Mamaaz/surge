@@ -20,8 +20,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         current_time = time.time()
         current_net_io = psutil.net_io_counters()
 
-        # Compute the send and receive rates if at least 30 seconds have passed since the last update
-        if current_time - last_update_time >= 30:
+        # Compute the send and receive rates if at least 2 seconds have passed since the last update
+        if current_time - last_update_time >= 2:
             time_interval = current_time - last_update_time
             send_rate = (current_net_io.bytes_sent - prev_net_io.bytes_sent) / time_interval / (1024*1024) * 8
             recv_rate = (current_net_io.bytes_recv - prev_net_io.bytes_recv) / time_interval / (1024*1024) * 8
