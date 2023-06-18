@@ -51,8 +51,8 @@ $httpClient.get(request, function(error, response, data) {
         const total = `总量: 200 GB`;
         const cpuUsage = `CPU: ${parseFloat(Data.cpu_usage).toFixed(2)}%`.padEnd(20);
         const memoryUsage = `内存: ${parseFloat(Data.mem_usage).toFixed(2)}%`;
-        const sendRate = `发送速率: ${parseFloat(Data.send_rate).toFixed(2)} Mbps`.padEnd(20);
-        const recvRate = `接收速率: ${parseFloat(Data.recv_rate).toFixed(2)} Mbps`;
+        const sendRate = Data.send_rate ? `发送速率: ${parseFloat(Data.send_rate).toFixed(2)} Mbps`.padEnd(20) : '发送速率: 数据还未准备好';
+        const recvRate = Data.recv_rate ? `接收速率: ${parseFloat(Data.recv_rate).toFixed(2)} Mbps` : '接收速率: 数据还未准备好';
 
         panel.content = `运行时间：${secondsToDhms(Data.uptime)}\n` +
             `内存使用：${Data.max_mem_process_name}\n` +
